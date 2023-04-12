@@ -1,9 +1,9 @@
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
-  signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -17,27 +17,30 @@ const firebaseConfig = {
   appId: "1:342768940549:web:4caabbf1f6cbb92f308e6c",
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
-provider.setCustomParameters({
+googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+
+// Google 登入的 Provider
+export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth) => {
-  const userDocRef = doc(db, "users", userAuth.uid);
+// 從 Auth 創建使用者資料，addtionalInformation : 假設得到一些額外訊息
+export const createUserDocumentFromAuth = async (userAuth, addtionalInformation = {}) => {
 
-  console.log(userDocRef);
+  if (!userAuth) return;
+
+  const userDocRef = doc(db, "users", userAuth.uid);
 
   const userSnapshot = await getDoc(userDocRef);
 
-  console.log(userSnapshot);
   // userSnapshot.exists() 檢查資料庫中是否存在快照的實例
   console.log(userSnapshot.exists());
 
@@ -51,6 +54,7 @@ export const createUserDocumentFromAuth = async (userAuth) => {
         displayName,
         email,
         createdAt,
+        ...addtionalInformation // 自己添加額外的訊息(displayName)
       });
     } catch (error) {
       console.log("error creating the user", error.message);
@@ -59,3 +63,9 @@ export const createUserDocumentFromAuth = async (userAuth) => {
 
   return userDocRef;
 };
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+  
+  return await createUserWithEmailAndPassword(auth, email, password)
+}
