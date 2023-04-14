@@ -2,9 +2,12 @@ import { initializeApp } from "firebase/app";
 import {
   getAuth,
   signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
 } from "firebase/auth";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -31,6 +34,8 @@ export const auth = getAuth();
 // Google 登入的 Provider
 export const signInWithGooglePopup = () => signInWithPopup(auth, googleProvider);
 
+export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider)
+
 export const db = getFirestore();
 
 // 從 Auth 創建使用者資料，addtionalInformation : 假設得到一些額外訊息
@@ -43,7 +48,7 @@ export const createUserDocumentFromAuth = async (userAuth, addtionalInformation 
   const userSnapshot = await getDoc(userDocRef);
 
   // userSnapshot.exists() 檢查資料庫中是否存在快照的實例
-  console.log(userSnapshot.exists());
+  // console.log(userSnapshot.exists());
 
   // 檢查快照是否存在，如果沒有就創建使用者資料
   if (!userSnapshot.exists()) {
@@ -76,3 +81,7 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
   
   return await signInWithEmailAndPassword(auth, email, password)  // firebase的函數
 }
+
+export const signOutUser = async () => await signOut(auth)
+
+export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback)

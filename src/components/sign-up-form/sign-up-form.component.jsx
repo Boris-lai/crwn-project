@@ -8,7 +8,7 @@ import {
   createUserDocumentFromAuth,
 } from "../../utils/firebase/firebase.utils";
 
-import "./sign-up-form.styles.scss"
+import "./sign-up-form.styles.scss";
 
 const defaultFormFields = {
   displayName: "",
@@ -40,8 +40,6 @@ const SignUpForm = () => {
         email,
         password
       );
-
-      console.log(user);
 
       await createUserDocumentFromAuth(user, { displayName });
       resetFormFields();
